@@ -14,7 +14,10 @@ VALUES ('Trevor Page', '226-555-4982');
 INSERT INTO `customers` (`customer_name`, `customer_phone_number`)
 VALUES ('John Doe', '555-555-9498');
 
-SELECT * FROM `customers`;
+SELECT 
+    *
+FROM
+    `customers`;
 
 -- 2. Menu Table
 CREATE TABLE `menu` (
@@ -36,7 +39,10 @@ VALUES ('Meat Lovers', 14.99);
 INSERT INTO `menu` (`pizza_type`, `pizza_price`)
 VALUES ('Hawaiian', 12.99);
 
-SELECT * FROM `menu`;
+SELECT 
+    *
+FROM
+    `menu`;
 
 -- 3. Orders Table    
 CREATE TABLE `orders` (
@@ -60,7 +66,10 @@ VALUES (1, '2023-09-10 09:47:00');
 INSERT INTO `orders` (`customer_id`, `order_date_time`)
 VALUES (2, '2023-10-10 10:37:00');
 
-SELECT * FROM `orders`;
+SELECT 
+    *
+FROM
+    `orders`;
 
 -- 4. Order Items Table
 CREATE TABLE `order_items` (
@@ -87,24 +96,39 @@ VALUES (3, 3, 1), (3, 4, 1);
 INSERT INTO `order_items` (`order_id`, `menu_item_id`, `quantity`)
 VALUES (4, 2, 3), (4, 4, 1);
 
-SELECT * FROM `order_items`;
+SELECT 
+    *
+FROM
+    `order_items`;
 
-SELECT c.customer_name,
-	c.customer_phone_number,
-    SUM(oi.quantity * m.pizza_price) AS total_spent
-FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id
-JOIN order_items oi ON o.order_id = oi.order_id
-JOIN menu m ON oi.menu_item_id = m.menu_item_id
+-- Query 1 - How much money each customer has spent at the restaurant
+SELECT 
+    c.customer_name AS `Customer`,
+    SUM(oi.quantity * m.pizza_price) AS `Total Spent`
+FROM
+    `customers` c
+        JOIN
+    `orders` o ON c.customer_id = o.customer_id
+        JOIN
+    `order_items` oi ON o.order_id = oi.order_id
+        JOIN
+    `menu` m ON oi.menu_item_id = m.menu_item_id
 GROUP BY c.customer_id;
 
-SELECT c.customer_name,
-	c.customer_phone_number,
-    DATE(o.order_date_time) AS order_date,
-    SUM(oi.quantity * m.pizza_price) AS total_spent
-FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id
-JOIN order_items oi ON o.order_id = oi.order_id
-JOIN menu m ON oi.menu_item_id = m.menu_item_id
-GROUP BY c.customer_id, DATE(o.order_date_time);
+-- Query 2 - How much each customer is ordering on which date
+SELECT 
+    c.customer_name AS `Customer`,
+    o.order_date_time AS `Order Date`,
+    m.pizza_type AS `Pizza Type`,
+    SUM(oi.quantity) AS `Total Ordered`
+FROM
+    `customers` c
+        JOIN
+    `orders` o ON c.customer_id = o.customer_id
+        JOIN
+    `order_items` oi ON o.order_id = oi.order_id
+        JOIN
+    `menu` m ON oi.menu_item_id = m.menu_item_id
+GROUP BY c.customer_id , o.order_date_time, m.pizza_type
+ORDER BY `Customer`, `Order Date`, `Pizza Type`;
     
